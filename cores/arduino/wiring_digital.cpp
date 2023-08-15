@@ -51,11 +51,15 @@ void pinMode(PinName pin, PinMode mode)
 
 void pinMode(pin_size_t pin, PinMode mode)
 {
-  mbed::DigitalInOut* gpio = digitalPinToGpio(pin);
-  if (gpio == NULL) {
-    gpio = new mbed::DigitalInOut(digitalPinToPinName(pin));
-    digitalPinToGpio(pin) = gpio;
+  if (pin >= PINS_COUNT) {
+    return;
   }
+  mbed::DigitalInOut* gpio = digitalPinToGpio(pin);
+  if (gpio != NULL) {
+    delete gpio;
+  }
+  gpio = new mbed::DigitalInOut(digitalPinToPinName(pin));
+  digitalPinToGpio(pin) = gpio;
 
   switch (mode) {
     case INPUT:

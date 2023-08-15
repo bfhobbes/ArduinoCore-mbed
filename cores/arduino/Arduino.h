@@ -83,6 +83,7 @@ typedef struct _AnalogPinDescription AnalogPinDescription;
 // Pins table to be instantiated into variant.cpp
 extern PinDescription g_APinDescription[];
 extern AnalogPinDescription g_AAnalogPinDescription[];
+extern AnalogPinDescription g_AAnalogOutPinDescription[];
 
 #ifdef ANALOG_CONFIG
 #include "hal/analogin_api.h"
@@ -100,6 +101,7 @@ extern analogin_config_t adcCurrentConfig;
 #endif
 
 #include "Serial.h"
+#include "timer.h"
 #if defined(SERIAL_CDC)
 #define Serial _UART_USB_
 #define SerialUSB _UART_USB_
@@ -110,6 +112,17 @@ extern analogin_config_t adcCurrentConfig;
 #define Serial2 _UART2_
 #define Serial3 _UART3_
 #define Serial4 _UART4_
+
+#if defined(RPC_SERIAL)
+#undef Serial
+#if __has_include("RPC.h")
+#include "SerialRPC.h"
+#define Serial SerialRPC
+#else
+extern ErrorSerialClass ErrorSerial;
+#define Serial ErrorSerial
+#endif
+#endif
 
 #include "overloads.h"
 #endif

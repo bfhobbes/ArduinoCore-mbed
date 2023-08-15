@@ -34,45 +34,142 @@ jobs:
       matrix:
         board:
           - fqbn: arduino:mbed:nano33ble
-          - fqbn: arduino:mbed:envie_m4
           - fqbn: arduino:mbed:envie_m7
           - fqbn: arduino:mbed:nanorp2040connect
+          - fqbn: arduino:mbed:nicla_sense
+          - fqbn: arduino:mbed:nicla_vision
+          - fqbn: arduino:mbed:opta
+          - fqbn: arduino:mbed:giga
+          - fqbn: arduino:mbed:nicla_voice
 
         # compile only the examples compatible with each board
         include:
           - board:
               fqbn: arduino:mbed:nano33ble
+            additional-libraries: |
+              - name: ArduinoBLE
             additional-sketch-paths: |
               - libraries/PDM
               - libraries/ThreadDebug
+              - libraries/USBHID
+              - libraries/USBMSD/examples/Nano33BLE_FlashMassStorage
+              - ~/Arduino/libraries/ArduinoBLE
           - board:
-              fqbn: arduino:mbed:envie_m4
+              fqbn: arduino:mbed:envie_m7:target_core=cm4
             additional-sketch-paths: |
-              - libraries/doom
               - libraries/KernelDebug
               - libraries/Portenta_SDCARD
-              - libraries/Portenta_Video
+              - libraries/Portenta_SDRAM
               - libraries/RPC
           - board:
               fqbn: arduino:mbed:envie_m7
+            additional-libraries: |
+              - name: lvgl
+                version: 8.3.5
+              - name: MicroNMEA
+              - name: ArduinoBLE
+              - name: ArduinoGraphics
+              - name: Arduino_GigaDisplayTouch
             additional-sketch-paths: |
               - libraries/PDM
               - libraries/doom
               - libraries/KernelDebug
-              - libraries/Portenta_Camera/examples
+              - libraries/MCUboot
+              - libraries/Camera/examples/CameraCaptureRawBytes
+              - libraries/Camera/examples/CameraMotionDetect
               - libraries/Portenta_SDCARD
-              - libraries/Portenta_System
-              - libraries/Portenta_Video
+              - libraries/Portenta_SDRAM
+              - libraries/STM32H747_System
+              - libraries/Arduino_H7_Video
               - libraries/RPC
               - libraries/ThreadDebug
+              - libraries/USBHID
               - libraries/USBHOST
+              - libraries/USBMSD/examples/AccessFlashAsUSBDisk
               - libraries/WiFi
+              - libraries/GSM
+              - ~/Arduino/libraries/ArduinoBLE
           - board:
               fqbn: arduino:mbed:nanorp2040connect
+            additional-libraries: |
+              - name: ArduinoBLE
+              - name: STM32duino LSM6DSOX
+            additional-sketch-paths: |
+              - libraries/MLC/examples/RP2040_DataLogger_FIFO
+              - libraries/PDM
+              - libraries/USBHID
+              - ~/Arduino/libraries/WiFiNINA
+              - ~/Arduino/libraries/ArduinoBLE
+          - board:
+              fqbn: arduino:mbed:nicla_sense
+            additional-sketch-paths: |
+              - libraries/Nicla_System
+              - ~/Arduino/libraries/Arduino_BHY2
+            additional-libraries: |
+              - name: Arduino_BHY2
+              - name: ArduinoBLE
+              - name: PacketSerial
+          - board:
+              fqbn: arduino:mbed:nicla_vision
             additional-sketch-paths: |
               - libraries/PDM
-              - ~/Arduino/libraries/WiFiNINA
-
+              - libraries/Camera/examples/CameraCaptureRawBytes
+              - libraries/Camera/examples/CameraCaptureZoomPan
+              - libraries/SE05X
+              - libraries/STM32H747_System
+              - libraries/ThreadDebug
+              - libraries/USBHID
+              - libraries/USBHOST
+              - libraries/USBMSD/examples/AccessFlashAsUSBDisk
+              - libraries/WiFi
+          - board:
+              fqbn: arduino:mbed:opta
+            additional-sketch-paths: |
+              - libraries/Ethernet
+              - libraries/STM32H747_System
+              - libraries/ThreadDebug
+              - libraries/USBHID
+              - libraries/USBMSD/examples/AccessFlashAsUSBDisk
+              - libraries/WiFi
+          - board:
+              fqbn: arduino:mbed:giga
+            additional-libraries: |
+              - name: lvgl
+                version: 8.3.5
+              - name: MicroNMEA
+              - name: ArduinoBLE
+              - name: ArduinoGraphics
+              - name: Arduino_GigaDisplayTouch
+            additional-sketch-paths: |
+              - libraries/PDM
+              - libraries/MCUboot
+              - libraries/Camera/examples/CameraCaptureRawBytes
+              - libraries/Camera/examples/CameraMotionDetect
+              - libraries/Portenta_SDCARD
+              - libraries/Portenta_SDRAM
+              - libraries/Arduino_H7_Video
+              - libraries/RPC
+              - libraries/ThreadDebug
+              - libraries/USBHID
+              - libraries/USBHOST
+              - libraries/USBMSD/examples/AccessFlashAsUSBDisk
+              - libraries/WiFi
+              - libraries/GSM
+              - ~/Arduino/libraries/ArduinoBLE
+          - board:
+              fqbn: arduino:mbed:nicla_voice
+            additional-sketch-paths: |
+              - libraries/Nicla_System
+              - libraries/NDP
+            additional-libraries: |
+              - name: Arduino_BHY2
+              - name: ArduinoBLE
+              - name: arduino-audio-tools
+                source-url: https://github.com/pschatzmann/arduino-audio-tools.git
+                version: v0.9.6
+              - name: arduino-libg722
+                source-url: https://github.com/pschatzmann/arduino-libg722.git
+              
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -90,10 +187,15 @@ jobs:
       - name: Compile examples
         uses: arduino/compile-sketches@v1
         with:
+          cli-compile-flags: |
+            # Use build path containing spaces to check for path quoting problems in compilation patterns
+            - --build-path
+            - ${{ runner.temp }}/path with spaces
           github-token: ${{ secrets.GITHUB_TOKEN }}
           fqbn: ${{ matrix.board.fqbn }}
           libraries: |
             - name: WiFiNINA
+            ${{ matrix.additional-libraries }}
           platforms: |
             # Use Board Manager to install the latest release of Arduino mbed Boards to get the toolchain
             - name: "arduino:mbed"

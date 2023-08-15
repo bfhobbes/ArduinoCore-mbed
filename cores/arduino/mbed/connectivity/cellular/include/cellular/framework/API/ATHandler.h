@@ -50,8 +50,6 @@ class FileHandle;
 extern const char *OK;
 extern const char *CRLF;
 
-#define BUFF_SIZE 32
-
 /* AT Error types enumeration */
 enum DeviceErrorType {
     DeviceErrorTypeNoError = 0,
@@ -114,7 +112,7 @@ public:
 
     /** Set callback function for URC
      *
-     *  @param prefix   URC text to look for, e.g. "+CMTI:". Maximum length is BUFF_SIZE.
+     *  @param prefix   URC text to look for, e.g. "+CMTI:". Maximum length is MBED_CONF_CELLULAR_AT_HANDLER_BUFFER_SIZE.
      *  @param callback function to call on prefix, or 0 to remove callback
      */
     void set_urc_handler(const char *prefix, Callback<void()> callback);
@@ -354,8 +352,15 @@ public:
      *
      *  @param str input buffer to be converted to hex ascii
      *  @param size of the input param str
+     *  @param quote_string if true it will add the double-quote character at beginning and end of string
      */
-    void write_hex_string(const char *str, size_t size);
+    void write_hex_string(const char *str, size_t size, bool quote_string = true);
+
+    /** Get the error detected during read_int()
+     *
+     *  @return the latest negative integer error got from read_int().
+     */
+    int32_t get_last_read_error();
 
     /** Reads as string and converts result to integer. Supports only non-negative integers.
      *
@@ -601,7 +606,7 @@ private: //Member variables
     bool _is_fh_usable;
 
     // should fit any prefix and int
-    char _recv_buff[BUFF_SIZE];
+    char _recv_buff[MBED_CONF_CELLULAR_AT_HANDLER_BUFFER_SIZE];
     // reading position
     size_t _recv_len;
     // reading length
@@ -630,7 +635,7 @@ private: //Member variables
     size_t _max_resp_length;
 
     // prefix set during resp_start and used to try matching possible information responses
-    char _info_resp_prefix[BUFF_SIZE];
+    char _info_resp_prefix[MBED_CONF_CELLULAR_AT_HANDLER_BUFFER_SIZE];
     bool _debug_on;
     bool _cmd_start;
     bool _use_delimiter;
@@ -639,8 +644,9 @@ private: //Member variables
     rtos::Kernel::Clock::time_point _start_time;
     // eventqueue event id
     int _event_id;
+    int32_t _last_read_error;
 
-    char _cmd_buffer[BUFF_SIZE];
+    char _cmd_buffer[MBED_CONF_CELLULAR_AT_HANDLER_BUFFER_SIZE];
 };
 
 } // namespace mbed

@@ -12,7 +12,7 @@ extern "C" bool isBetaBoard();
 
 // Booting
 // ----
-#define bootM4() LL_RCC_ForceCM4Boot() // Provide a memorable alias
+void bootM4();
 
 extern PinName digitalPinToPinName(pin_size_t P);
 
@@ -69,16 +69,16 @@ static const uint8_t A7  = PIN_A7;
 #define D12 (12u)
 #define D13 (13u)
 #define D14 (14u)
-#define D15 (15u)
-#define D16 (u16)
-#define D17 (u17)
-#define D18 (u18)
-#define D19 (u19)
-#define D20 (u20)
-#define D21 (u21)
+#define D15 #error Pin cannot be used as digital pin.
+#define D16 #error Pin cannot be used as digital pin.
+#define D17 #error Pin cannot be used as digital pin.
+#define D18 #error Pin cannot be used as digital pin.
+#define D19 (19u)
+#define D20 (20u)
+#define D21 (21u)
 
 //DACs
-#define DAC           (A6)
+#define DAC           A6
 
 // Serial
 #define PIN_SERIAL_RX (13ul)
@@ -94,6 +94,14 @@ static const uint8_t SS   = PIN_SPI_SS;   // SPI Slave SS not used. Set here onl
 static const uint8_t MOSI = PIN_SPI_MOSI;
 static const uint8_t MISO = PIN_SPI_MISO;
 static const uint8_t SCK  = PIN_SPI_SCK;
+
+// QSPI
+#define QSPI_SO0        PD_11
+#define QSPI_SO1        PD_12
+#define QSPI_SO2        PF_7
+#define QSPI_SO3        PD_13
+#define QSPI_SCK        PF_10
+#define QSPI_CS         PG_6
 
 // Wire
 #define PIN_WIRE_SDA        (11u)
@@ -122,7 +130,7 @@ static const uint8_t SCK  = PIN_SPI_SCK;
 uint8_t getUniqueSerialNumber(uint8_t* name);
 void _ontouch1200bps_();
 
-#define WIRE_HOWMANY		2
+#define WIRE_HOWMANY		3
 
 #define I2C_SDA				(digitalPinToPinName(PIN_WIRE_SDA))
 #define I2C_SCL				(digitalPinToPinName(PIN_WIRE_SCL))
@@ -131,6 +139,8 @@ void _ontouch1200bps_();
 #define I2C_SCL_INTERNAL	(PB_6)
 #define I2C_SDA1			I2C_SDA_INTERNAL
 #define I2C_SCL1			I2C_SCL_INTERNAL
+#define I2C_SDA2			(PH_12)
+#define I2C_SCL2			(PH_11)
 
 #define SPI_HOWMANY			1
 
@@ -153,5 +163,10 @@ void _ontouch1200bps_();
 #define CRYPTO_WIRE		Wire1
 
 #define USB_MAX_POWER	(500)
+
+#define CAN_HOWMANY       1
+
+#define PIN_CAN0_TX       (PH_13) /* Labeled CAN1_TX on high-density connector. */
+#define PIN_CAN0_RX       (PB_8)  /* Labeled CAN1_RX on high-density connector. */
 
 #endif //__PINS_ARDUINO__

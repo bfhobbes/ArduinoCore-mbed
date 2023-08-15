@@ -39,8 +39,7 @@ compiler.define=-DARDUINO=
 
 # this can be overriden in boards.txt
 build.extra_flags=
-build.extra.startobjects=
-build.extra.endobjects=
+build.extra_ldflags=
 compiler.mbed=
 
 # These can be overridden in platform.local.txt
@@ -71,19 +70,22 @@ build.zip.pattern={recipe.size.pattern}
 # -----------------------
 
 ## Compile c files
-recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_ARCH_MBED {build.library_discovery_phase_flag} {build.extra_flags} {compiler.c.extra_flags} "-I{build.core.path}/api/deprecated" "-I{build.core.path}/api/deprecated-avr-comp" {includes} "-iprefix{build.core.path}" "@{compiler.mbed.includes}" -o "{object_file}" "{source_file}"
+recipe.c.o.pattern="{compiler.path}{compiler.c.cmd}" {compiler.c.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_ARCH_MBED {build.library_discovery_phase_flag} {build.extra_flags} {build.extra_ldflags} {compiler.c.extra_flags} "-I{build.core.path}/api/deprecated" "-I{build.core.path}/api/deprecated-avr-comp" {includes} "-iprefix{build.core.path}" "@{compiler.mbed.includes}" -o "{object_file}" "{source_file}"
 
 ## Compile c++ files
-recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_ARCH_MBED {build.library_discovery_phase_flag} {includes} {build.extra_flags} {compiler.cpp.extra_flags} "-I{build.core.path}/api/deprecated" "-I{build.core.path}/api/deprecated-avr-comp" "-iprefix{build.core.path}" "@{compiler.mbed.includes}" "{source_file}" -o "{object_file}"
+recipe.cpp.o.pattern="{compiler.path}{compiler.cpp.cmd}" {compiler.cpp.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_ARCH_MBED {build.library_discovery_phase_flag} {includes} {build.extra_flags} {build.extra_ldflags} {compiler.cpp.extra_flags} "-I{build.core.path}/api/deprecated" "-I{build.core.path}/api/deprecated-avr-comp" "-iprefix{build.core.path}" "@{compiler.mbed.includes}" "{source_file}" -o "{object_file}"
 
 ## Compile asm files
-recipe.S.o.pattern="{compiler.path}{compiler.S.cmd}" {compiler.S.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_ARCH_MBED {includes} {build.extra_flags} {compiler.cpp.extra_flags} "-I{build.core.path}/api/deprecated" "-I{build.core.path}/api/deprecated-avr-comp" "-iprefix{build.core.path}" "@{compiler.mbed.includes}" "{source_file}" -o "{object_file}"
+recipe.S.o.pattern="{compiler.path}{compiler.S.cmd}" {compiler.S.flags} -DARDUINO={runtime.ide.version} -DARDUINO_{build.board} -DARDUINO_ARCH_{build.arch} -DARDUINO_ARCH_MBED {includes} {build.extra_flags} {build.extra_ldflags} {compiler.cpp.extra_flags} "-I{build.core.path}/api/deprecated" "-I{build.core.path}/api/deprecated-avr-comp" "-iprefix{build.core.path}" "@{compiler.mbed.includes}" "{source_file}" -o "{object_file}"
 
 ## Create archives
 recipe.ar.pattern="{compiler.path}{compiler.ar.cmd}" {compiler.ar.flags} {compiler.ar.extra_flags} "{archive_file_path}" "{object_file}"
 
+## Preprocess linker script
+recipe.hooks.linking.prelink.1.pattern="{compiler.path}{compiler.c.elf.cmd}" -E -P -x c {build.extra_ldflags} "{build.variant.path}/{build.ldscript}" -o "{build.path}/{build.ldscript}"
+
 ## Combine gc-sections, archives, and objects
-recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}"  "-L{build.path}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} "@{compiler.mbed.ldflags}" "-T{build.variant.path}/{build.ldscript}" "-Wl,-Map,{build.path}/{build.project_name}.map" --specs=nosys.specs {compiler.ldflags} -o "{build.path}/{build.project_name}.elf" {object_files} -Wl,--whole-archive "{build.path}/{archive_file}" {compiler.mbed} -Wl,--no-whole-archive -Wl,--start-group {compiler.mbed.extra_ldflags} {compiler.libraries.ldflags} -Wl,--end-group
+recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}"  "-L{build.path}" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} {build.extra_flags} {build.extra_ldflags} "@{compiler.mbed.ldflags}" "-T{build.path}/{build.ldscript}" "-Wl,-Map,{build.path}/{build.project_name}.map" --specs=nosys.specs {compiler.ldflags} -o "{build.path}/{build.project_name}.elf" {object_files} -Wl,--whole-archive "{build.path}/{archive_file}" {compiler.mbed} -Wl,--no-whole-archive -Wl,--start-group {compiler.mbed.extra_ldflags} {compiler.libraries.ldflags} -Wl,--end-group
 
 ## Create eeprom
 recipe.objcopy.eep.pattern=
@@ -97,26 +99,37 @@ recipe.objcopy.hex.pattern="{compiler.path}{compiler.elf2hex.cmd}" {compiler.elf
 ## Compute size
 recipe.size.pattern="{compiler.path}{compiler.size.cmd}" -A "{build.path}/{build.project_name}.elf"
 recipe.size.regex.data=^(?:\.data|\.bss)\s+([0-9]+).*
-recipe.size.regex=^(?:\.data|\.text)\s+([0-9]+).*
+recipe.size.regex=^(?:\.data|\.text|\.rodata)\S*?\s+([0-9]+).*
 
 ## Save hex
 recipe.output.tmp_file={build.project_name}.bin
 recipe.output.save_file={build.project_name}.{build.variant}.bin
 
-# Uploader tools
-# ---------------------
 
-tools.openocd.path={runtime.tools.openocd.path}
+# Required discoveries and monitors
+# ---------------------------------
+pluggable_discovery.required.0=builtin:serial-discovery
+pluggable_discovery.required.1=builtin:mdns-discovery
+pluggable_monitor.required.serial=builtin:serial-monitor
+
+
+# Uploader tools
+# --------------
+
+#
+# OpenOCD
+#
+tools.openocd.path={runtime.tools.openocd-0.11.0-arduino2.path}
 tools.openocd.cmd=bin/openocd
 tools.openocd.cmd.windows=bin/openocd.exe
 
 tools.openocd.upload.params.verbose=-d2
 tools.openocd.upload.params.quiet=-d0
-tools.openocd.upload.pattern="{path}/{cmd}" {upload.verbose} -s "{path}/share/openocd/scripts/" {bootloader.programmer} {bootloader.config} -c "telnet_port disabled; init; reset init; halt; adapter speed 10000; program {{build.path}/{build.project_name}.elf}; reset run; shutdown"
+tools.openocd.upload.pattern="{path}/{cmd}" {upload.verbose} -s "{path}/share/openocd/scripts/" {bootloader.programmer} {upload.transport} {bootloader.config} -c "telnet_port disabled; init; reset init; halt; adapter speed 10000; program {{build.path}/{build.project_name}.elf}; reset run; shutdown"
 
 tools.openocd.program.params.verbose=-d2
 tools.openocd.program.params.quiet=-d0
-tools.openocd.program.pattern="{path}/{cmd}" {program.verbose} -s "{path}/share/openocd/scripts/" {bootloader.programmer} {bootloader.config} -c "telnet_port disabled; init; reset init; halt; adapter speed 10000; program {{build.path}/{build.project_name}.elf}; reset run; shutdown"
+tools.openocd.program.pattern="{path}/{cmd}" {program.verbose} -s "{path}/share/openocd/scripts/" {bootloader.programmer} {upload.transport} {bootloader.config} -c "telnet_port disabled; init; reset init; halt; adapter speed 10000; program {{build.path}/{build.project_name}.elf}; reset run; shutdown"
 
 tools.openocd.erase.params.verbose=-d2
 tools.openocd.erase.params.quiet=-d0
@@ -124,7 +137,7 @@ tools.openocd.erase.pattern=
 
 tools.openocd.bootloader.params.verbose=-d2
 tools.openocd.bootloader.params.quiet=-d0
-tools.openocd.bootloader.pattern="{path}/{cmd}" {bootloader.verbose} -s "{path}/share/openocd/scripts/" {bootloader.programmer} {bootloader.config} -c "telnet_port disabled; init; reset init; halt; adapter speed 10000; {bootloader.extra_action.preflash}; program {{runtime.platform.path}/bootloaders/{bootloader.file}}; reset run; shutdown"
+tools.openocd.bootloader.pattern="{path}/{cmd}" {bootloader.verbose} -s "{path}/share/openocd/scripts/" {bootloader.programmer} {upload.transport} {bootloader.config} -c "telnet_port disabled; init; reset init; halt; adapter speed 10000; {bootloader.extra_action.preflash}; program {{runtime.platform.path}/bootloaders/{bootloader.file}}; reset run; shutdown"
 
 #
 # BOSSA
@@ -137,7 +150,9 @@ tools.bossac.upload.params.verbose=-d
 tools.bossac.upload.params.quiet=
 tools.bossac.upload.pattern="{path}/{cmd}" {upload.verbose} --port={serial.port.file} -U -i -e -w "{build.path}/{build.project_name}.bin" -R
 
+#
 # STM32FLASH
+#
 tools.stm32flash.cmd=stm32flash
 tools.stm32flash.path={runtime.platform.path}/tools/windows
 tools.stm32flash.path.macosx={runtime.platform.path}/tools/macosx
@@ -157,7 +172,6 @@ tools.stm32flash.erase.pattern="{path}/{cmd}" {serial.port} -e 1024 -b 2400
 #
 tools.dfu-util.path={runtime.tools.dfu-util.path}
 tools.dfu-util.cmd=dfu-util
-
 tools.dfu-util.upload.params.verbose=-d
 tools.dfu-util.upload.params.quiet=
 tools.dfu-util.upload.pattern="{path}/{cmd}" --device {upload.vid}:{upload.pid} -D "{build.path}/{build.project_name}.bin" -a{upload.interface} --dfuse-address={upload.address}:leave
@@ -165,13 +179,29 @@ tools.dfu-util.upload.pattern="{path}/{cmd}" --device {upload.vid}:{upload.pid} 
 #
 # PICOTOOL
 #
-
 tools.picotool.path={runtime.tools.rp2040tools.path}
 tools.picotool.cmd=rp2040load
-
 tools.picotool.upload.params.verbose=-v
 tools.picotool.upload.params.quiet=
 tools.picotool.upload.pattern="{path}/{cmd}" {upload.verbose} -D "{build.path}/{build.project_name}.elf"
+
+#
+# IMGTOOL
+#
+
+tools.imgtool.path={runtime.tools.imgtool.path}
+tools.imgtool.cmd=imgtool
+tools.imgtool.flags=sign --key "{build.keys.keychain}/{build.keys.sign_key}" --encrypt "{build.keys.keychain}/{build.keys.encrypt_key}" "{build.path}/{build.project_name}.bin" "{build.path}/{build.project_name}.bin" --align {build.alignment} --max-align {build.alignment} --version {build.version} --header-size {build.header_size} --pad-header --slot-size {build.slot_size}
+
+#
+# ADB WRAPPER
+#
+
+tools.adb.path={runtime.tools.adb.path}
+tools.adb.cmd=adb
+tools.adb.upload.params.verbose=-v
+tools.adb.upload.params.quiet=
+tools.adb.upload.pattern="{path}/{cmd}" push "{build.path}/{build.project_name}.elf" "/tmp/arduino/m4-user-sketch.elf"
 
 #
 # GDB (Debugger)

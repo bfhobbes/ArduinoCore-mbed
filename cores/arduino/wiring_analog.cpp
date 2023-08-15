@@ -29,16 +29,16 @@ static int read_resolution = 10;
 
 #if DEVICE_ANALOGOUT
 #include "drivers/AnalogOut.h"
-mbed::AnalogOut* dac = NULL;
-void analogWriteDAC(PinName pin, int val) {
-  if (dac == NULL) {
-    dac = new mbed::AnalogOut(pin);
+mbed::AnalogOut* dac[NUM_ANALOG_OUTPUTS] = { NULL };
+void analogWriteDAC(PinName pin, int val, int idx) {
+  if (dac[idx] == NULL) {
+    dac[idx] = new mbed::AnalogOut(pin);
   }
   float percent = (float)val/(float)((1 << write_resolution)-1);
   if (percent > 1.0f) {
     percent = 1.0f;
   }
-  dac->write(percent);
+  dac[idx]->write(percent);
 }
 #endif
 
@@ -61,10 +61,12 @@ void analogWrite(pin_size_t pin, int val)
     return;
   }
 #ifdef DAC
-    if (pin == DAC) {
-      analogWriteDAC(digitalPinToPinName(pin), val);
+  for (unsigned int i=0; i<NUM_ANALOG_OUTPUTS; i++) {
+    if (digitalPinToPinName(pin) == g_AAnalogOutPinDescription[i].name) {
+      analogWriteDAC(digitalPinToPinName(pin), val, i);
       return;
     }
+  }
 #endif
   float percent = (float)val/(float)((1 << write_resolution)-1);
   mbed::PwmOut* pwm = digitalPinToPwm(pin);

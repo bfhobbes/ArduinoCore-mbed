@@ -69,6 +69,7 @@
 #define MBED_CONF_BLE_API_IMPLEMENTATION_MAX_CHARACTERISTIC_AUTHORISATION_COUNT 20                                                                                               // set by library:ble-api-implementation
 #define MBED_CONF_BLE_PRESENT                                                   1                                                                                                // set by library:ble
 #define MBED_CONF_BLE_TRACE_HUMAN_READABLE_ENUMS                                0                                                                                                // set by library:ble
+#define MBED_CONF_CELLULAR_AT_HANDLER_BUFFER_SIZE                               32                                                                                               // set by library:cellular
 #define MBED_CONF_CELLULAR_CONTROL_PLANE_OPT                                    0                                                                                                // set by library:cellular
 #define MBED_CONF_CELLULAR_DEBUG_AT                                             0                                                                                                // set by library:cellular
 #define MBED_CONF_CELLULAR_MAX_CP_DATA_RECV_LEN                                 1358                                                                                             // set by library:cellular
@@ -158,6 +159,8 @@
 #define MBED_CONF_FAT_CHAN_FF_NORTC_MDAY                                        1                                                                                                // set by library:fat_chan
 #define MBED_CONF_FAT_CHAN_FF_NORTC_MON                                         1                                                                                                // set by library:fat_chan
 #define MBED_CONF_FAT_CHAN_FF_NORTC_YEAR                                        2017                                                                                             // set by library:fat_chan
+#define MBED_CONF_FAT_CHAN_FF_PRINT_FLOAT                                       0                                                                                                // set by library:fat_chan
+#define MBED_CONF_FAT_CHAN_FF_PRINT_LLI                                         0                                                                                                // set by library:fat_chan
 #define MBED_CONF_FAT_CHAN_FF_SFN_BUF                                           12                                                                                               // set by library:fat_chan
 #define MBED_CONF_FAT_CHAN_FF_STRF_ENCODE                                       3                                                                                                // set by library:fat_chan
 #define MBED_CONF_FAT_CHAN_FF_STR_VOLUME_ID                                     0                                                                                                // set by library:fat_chan
@@ -219,6 +222,7 @@
 #define MBED_CONF_LWIP_MEM_SIZE                                                 1600                                                                                             // set by library:lwip
 #define MBED_CONF_LWIP_ND6_QUEUEING                                             0                                                                                                // set by library:lwip
 #define MBED_CONF_LWIP_ND6_RDNSS_MAX_DNS_SERVERS                                0                                                                                                // set by library:lwip
+#define MBED_CONF_LWIP_NETBUF_RECVINFO_ENABLED                                  0                                                                                                // set by library:lwip
 #define MBED_CONF_LWIP_NUM_NETBUF                                               8                                                                                                // set by library:lwip
 #define MBED_CONF_LWIP_NUM_PBUF                                                 8                                                                                                // set by library:lwip
 #define MBED_CONF_LWIP_PBUF_POOL_SIZE                                           5                                                                                                // set by library:lwip
@@ -264,6 +268,7 @@
 #define MBED_CONF_PLATFORM_CALLBACK_NONTRIVIAL                                  1                                                                                                // set by application[*]
 #define MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED                                0                                                                                                // set by library:platform
 #define MBED_CONF_PLATFORM_CTHUNK_COUNT_MAX                                     8                                                                                                // set by library:platform
+#define MBED_CONF_PLATFORM_DEEPSLEEP_STATS_VERBOSE                              1                                                                                                // set by library:platform
 #define MBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE                             115200                                                                                           // set by application[*]
 #define MBED_CONF_PLATFORM_ERROR_ALL_THREADS_INFO                               0                                                                                                // set by library:platform
 #define MBED_CONF_PLATFORM_ERROR_FILENAME_CAPTURE_ENABLED                       0                                                                                                // set by library:platform
@@ -302,6 +307,7 @@
 #define MBED_CONF_QSPIF_QSPI_POLARITY_MODE                                      0                                                                                                // set by library:qspif
 #define MBED_CONF_QSPIF_QSPI_SCK                                                MBED_CONF_DRIVERS_QSPI_SCK                                                                       // set by library:qspif
 #define MBED_CONF_RTOS_API_PRESENT                                              1                                                                                                // set by library:rtos-api
+#define MBED_CONF_RTOS_ENABLE_ALL_RTX_EVENTS                                    0                                                                                                // set by library:rtos
 #define MBED_CONF_RTOS_EVFLAGS_NUM                                              0                                                                                                // set by library:rtos
 #define MBED_CONF_RTOS_IDLE_THREAD_STACK_SIZE                                   512                                                                                              // set by library:rtos
 #define MBED_CONF_RTOS_IDLE_THREAD_STACK_SIZE_DEBUG_EXTRA                       0                                                                                                // set by library:rtos

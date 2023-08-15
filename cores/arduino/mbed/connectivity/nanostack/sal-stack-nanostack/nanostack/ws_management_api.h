@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2019, Arm Limited and affiliates.
+ * Copyright (c) 2018-2021, Pelion and affiliates.
  * SPDX-License-Identifier: Apache-2.0
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -77,6 +77,17 @@ extern "C" {
 #define CHANNEL_SPACING_250     0x04    /**< 250 khz */
 #define CHANNEL_SPACING_800     0x05    /**< 800 khz */
 #define CHANNEL_SPACING_1200    0x06    /**< 1200 khz */
+
+/*
+ * Wi-SUN FAN 1.1 Phy capability types.
+ *
+ */
+#define WS_PHY_TYPE_ID_FSK 0            /**< FSK phy type */
+#define WS_PHY_TYPE_ID_FSK_FEC 1        /**< FSK with FEC phy type */
+#define WS_PHY_TYPE_ID_OFDM1 2          /**< OFDM1 phy type */
+#define WS_PHY_TYPE_ID_OFDM2 3          /**< OFDM2 phy type */
+#define WS_PHY_TYPE_ID_OFDM3 4          /**< OFDM3 phy type */
+#define WS_PHY_TYPE_ID_OFDM4 5          /**< OFDM4 phy type */
 
 /*
  *  Network Size definitions are device amount in hundreds of devices.
@@ -224,6 +235,28 @@ typedef struct ws_neighbour_info {
     /** Neighbour type (Primary Parent, Secondary Parent, Candidate parent, child, other(Temporary neighbours))*/
     ws_management_neighbor_type_e type;
 } ws_neighbour_info_t;
+
+
+/**
+ * @brief ws_management_pcap_t Wi-SUN FAN 1.1 Phy Capability type and operating mode
+ */
+typedef struct ws_management_pcap {
+    /** Phy type */
+    uint8_t phy_type;
+    /** Phy operating mode */
+    uint16_t operating_mode;
+} ws_management_pcap_t;
+
+/**
+ * @brief ws_management_pcap_info_t Wi-SUN FAN 1.1 Phy Capability list for MDR support
+ */
+typedef struct ws_management_pcap_info {
+    /** Length of the capability */
+    uint8_t length_of_list: 3;
+    /** Capability information */
+    ws_management_pcap_t pcap[7];
+} ws_management_pcap_info_t;
+
 
 /**
  * Initialize Wi-SUN stack.
@@ -857,9 +890,13 @@ int ws_neighbor_info_get(
  *
  * Setting a value that is not suitable for Radio might prevent the device joining to the network.
  *
- * NOTE: Currently lower EAPOL parents are accepted if there is no parents higher than
- *       DEVICE_MIN_SENS + CAND_PARENT_THRESHOLD + CAND_PARENT_HYSTERESIS
- * NOTE: Currently not using this value to limit parents as it is only RECOMENDED in specification.
+ * This configuration limits the EAPOL parents accepted for Authentication and device must hear signal
+ * level higher than device_min_sens + CAND_PARENT_THRESHOLD + CAND_PARENT_HYSTERESIS
+ * to start authentication.
+ *
+ * ETX Calculation gives a maximum ETX if two way EWMA RSL is less than
+ * device_min_sens + CAND_PARENT_THRESHOLD + CAND_PARENT_HYSTERESIS to
+ * prevent selecting parents with poor signal quality
  *
  * \param interface_id Network interface ID.
  * \param device_min_sens value used in the parent selections.
@@ -870,6 +907,20 @@ int ws_neighbor_info_get(
 int ws_device_min_sens_set(
     int8_t interface_id,
     uint8_t device_min_sens);
+
+/**
+ * Set Phy Capability support for MDR, FAN 1.1 feature
+ *
+ *
+ * \param interface_id Network interface ID.
+ * \param pcap_list pointer to supported list
+ *
+ * \return 0 Success.
+ * \return <0 Failure.
+ */
+int ws_management_phy_capability_set(
+    int8_t interface_id,
+    ws_management_pcap_info_t *pcap_list);
 
 #ifdef __cplusplus
 }

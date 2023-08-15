@@ -28,24 +28,32 @@ arduino::MbedI2C::MbedI2C(int sda, int scl) : _sda(digitalPinToPinName(sda)), _s
 arduino::MbedI2C::MbedI2C(PinName sda, PinName scl) : _sda(sda), _scl(scl), usedTxBuffer(0) {}
 
 void arduino::MbedI2C::begin() {
+	end();
 	master = new mbed::I2C(_sda, _scl);
 }
 
 void arduino::MbedI2C::begin(uint8_t slaveAddr) {
 #ifdef DEVICE_I2CSLAVE
+	end();
 	slave = new mbed::I2CSlave((PinName)_sda, (PinName)_scl);
 	slave->address(slaveAddr << 1);
-	slave_th.start(mbed::callback(this, &arduino::MbedI2C::receiveThd));
+	slave_th = new rtos::Thread(osPriorityNormal, 2048, nullptr, "I2CSlave");
+	slave_th->start(mbed::callback(this, &arduino::MbedI2C::receiveThd));
 #endif
 }
 
 void arduino::MbedI2C::end() {
 	if (master != NULL) {
 		delete master;
+		master = NULL;
 	}
 #ifdef DEVICE_I2CSLAVE
 	if (slave != NULL) {
+		slave_th->terminate();
+		slave_th->free_stack();
+		delete slave_th;
 		delete slave;
+		slave = NULL;
 	}
 #endif
 }
@@ -116,7 +124,7 @@ int arduino::MbedI2C::read() {
 	if (rxBuffer.available()) {
 		return rxBuffer.read_char();
 	}
-	return 0;
+	return -1;
 }
 
 int arduino::MbedI2C::available() {
@@ -145,12 +153,12 @@ void arduino::MbedI2C::receiveThd() {
 					slave->write((const char *) txBuffer, usedTxBuffer);
 					usedTxBuffer = 0;
 				}
-				slave->stop();
+				//slave->stop();
 				break;
 			case mbed::I2CSlave::WriteGeneral:
 			case mbed::I2CSlave::WriteAddressed:
 				rxBuffer.clear();
-				char buf[72];
+				char buf[240];
 				c = slave->read(buf, sizeof(buf));
 				for (buf_idx = 0; buf_idx < c; buf_idx++) {
 					if (rxBuffer.availableForStore()) {
@@ -162,7 +170,7 @@ void arduino::MbedI2C::receiveThd() {
 				if (rxBuffer.available() > 0 && onReceiveCb != NULL) {
 					onReceiveCb(rxBuffer.available());
 				}
-				slave->stop();
+				//slave->stop();
 				break;
 		case mbed::I2CSlave::NoData:
 			//slave->stop();
@@ -185,5 +193,8 @@ void arduino::MbedI2C::onRequest(voidFuncPtr cb) {
 arduino::MbedI2C Wire(I2C_SDA, I2C_SCL);
 #endif
 #if WIRE_HOWMANY > 1
-arduino::MbedI2C Wire1(I2C_SDA1, I2C_SCL1);;
+arduino::MbedI2C Wire1(I2C_SDA1, I2C_SCL1);
+#endif
+#if WIRE_HOWMANY > 2
+arduino::MbedI2C Wire2(I2C_SDA2, I2C_SCL2);
 #endif

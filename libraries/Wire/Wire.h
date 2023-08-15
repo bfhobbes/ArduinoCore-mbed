@@ -82,7 +82,7 @@ private:
     voidFuncPtrParamInt onReceiveCb = NULL;
     voidFuncPtr onRequestCb = NULL;
 #ifdef DEVICE_I2CSLAVE
-    rtos::Thread slave_th;
+    rtos::Thread* slave_th;
     void receiveThd();
 #endif
 };
@@ -94,6 +94,9 @@ extern arduino::MbedI2C Wire;
 #endif
 #if WIRE_HOWMANY > 1
 extern arduino::MbedI2C Wire1;
+#endif
+#if WIRE_HOWMANY > 2
+extern arduino::MbedI2C Wire2;
 #endif
 
 typedef arduino::MbedI2C TwoWire;

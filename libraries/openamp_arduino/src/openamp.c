@@ -162,17 +162,19 @@ int OPENAMP_create_endpoint(struct rpmsg_endpoint *ept, const char *name,
 		          unbind_cb);
   }
 
-void OPENAMP_check_for_message(void)
+int OPENAMP_check_for_message(void)
 {
-  MAILBOX_Poll(rvdev.vdev);
+  return MAILBOX_Poll(rvdev.vdev);
 }
 
-void OPENAMP_Wait_EndPointready(struct rpmsg_endpoint *rp_ept, size_t timeout)
+unsigned long millis();
+
+void OPENAMP_Wait_EndPointready(struct rpmsg_endpoint *rp_ept, size_t deadline)
 {
-  while(!is_rpmsg_ept_ready(rp_ept) && (HAL_GetTick() < timeout)) {
+  while(!is_rpmsg_ept_ready(rp_ept) && (millis() < deadline)) {
     MAILBOX_Poll(rvdev.vdev);
   }
-  if (HAL_GetTick() >= timeout) {
+  if (millis() >= deadline) {
     printf("OPENAMP_Wait_EndPointready %X timed out\n\r", (unsigned int)rp_ept);
   }
 }

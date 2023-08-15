@@ -126,17 +126,28 @@ void UART::begin(unsigned long baudrate) {
 	}
 }
 
+void UART::begin(unsigned long baudrate, uint16_t config, bool no_rx_pullup) {
+	begin(baudrate, config);
+#if defined(SET_GPIO_PULL_FUNCTION)
+	if (no_rx_pullup) {
+		SET_GPIO_PULL_FUNCTION(_rx, NO_PULL);
+	}
+#endif
+}
+
 void UART::on_rx() {
 #if defined(SERIAL_CDC)
 	if (is_usb) {
 		return;
 	}
 #endif
-	while(_serial->obj->readable() && rx_buffer.availableForStore()) {
+	while(_serial->obj->readable()) {
 		char c;
 		core_util_critical_section_enter();
 		_serial->obj->read(&c, 1);
-		rx_buffer.store_char(c);
+		if (rx_buffer.availableForStore()) {
+			rx_buffer.store_char(c);
+		}
 		core_util_critical_section_exit();
 	}
 }
@@ -193,7 +204,15 @@ int UART::read() {
 }
 
 void UART::flush() {
+#if defined(SERIAL_CDC)
+	if (is_usb) {
+		while(!_SerialUSB.writeable());
+	} else {
+		while(!_serial->obj->writeable());
+	}
+#else
 	while(!_serial->obj->writeable());
+#endif
 }
 
 size_t UART::write(uint8_t c) {

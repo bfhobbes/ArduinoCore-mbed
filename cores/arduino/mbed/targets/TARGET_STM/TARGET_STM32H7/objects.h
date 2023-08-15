@@ -50,10 +50,13 @@ struct port_s {
     __IO uint32_t *reg_out;
 };
 
+#if DEVICE_TRNG
 struct trng_s {
     RNG_HandleTypeDef handle;
 };
+#endif
 
+#if DEVICE_PWMOUT
 struct pwmout_s {
     PWMName pwm;
     PinName pin;
@@ -63,7 +66,9 @@ struct pwmout_s {
     uint8_t channel;
     uint8_t inverted;
 };
+#endif
 
+#if DEVICE_SPI
 struct spi_s {
     SPI_HandleTypeDef handle;
     IRQn_Type spiIRQ;
@@ -77,6 +82,7 @@ struct spi_s {
     uint8_t transfer_type;
 #endif
 };
+#endif
 
 struct serial_s {
     UARTName uart;
@@ -114,13 +120,14 @@ struct i2c_s {
     uint32_t XferOperation;
     volatile uint8_t event;
     volatile int pending_start;
+    int current_hz;
 #if DEVICE_I2CSLAVE
     uint8_t slave;
     volatile uint8_t pending_slave_tx_master_rx;
     volatile uint8_t pending_slave_rx_maxter_tx;
     uint8_t *slave_rx_buffer;
-    volatile uint8_t slave_rx_buffer_size;
-    volatile uint8_t slave_rx_count;
+    volatile uint16_t slave_rx_buffer_size;
+    volatile uint16_t slave_rx_count;
 #endif
 #if DEVICE_I2C_ASYNCH
     uint32_t address;
@@ -129,12 +136,14 @@ struct i2c_s {
 #endif
 };
 
+#if DEVICE_ANALOGIN
 struct analogin_s {
     ADC_HandleTypeDef handle;
     PinName pin;
     uint8_t channel;
     uint8_t differential;
 };
+#endif
 
 #if DEVICE_QSPI
 struct qspi_s {
@@ -176,12 +185,14 @@ struct qspi_s {
 #endif /* DUAL_CORE */
 #include "gpio_object.h"
 
+#if DEVICE_ANALOGOUT
 struct dac_s {
     DACName dac;
     PinName pin;
     uint32_t channel;
     DAC_HandleTypeDef handle;
 };
+#endif
 
 struct flash_s {
     /*  nothing to be stored for now */

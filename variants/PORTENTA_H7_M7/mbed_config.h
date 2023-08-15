@@ -71,9 +71,11 @@
 #define MBED_CONF_BLE_API_IMPLEMENTATION_MAX_CHARACTERISTIC_AUTHORISATION_COUNT 20                                                                                               // set by library:ble-api-implementation
 #define MBED_CONF_BLE_PRESENT                                                   1                                                                                                // set by library:ble
 #define MBED_CONF_BLE_TRACE_HUMAN_READABLE_ENUMS                                0                                                                                                // set by library:ble
+#define MBED_CONF_CELLULAR_AT_HANDLER_BUFFER_SIZE                               512                                                                                              // set by application[*]
 #define MBED_CONF_CELLULAR_CONTROL_PLANE_OPT                                    0                                                                                                // set by library:cellular
-#define MBED_CONF_CELLULAR_DEBUG_AT                                             0                                                                                                // set by library:cellular
+#define MBED_CONF_CELLULAR_DEBUG_AT                                             1                                                                                                // set by application[*]
 #define MBED_CONF_CELLULAR_MAX_CP_DATA_RECV_LEN                                 1358                                                                                             // set by library:cellular
+#define MBED_CONF_CELLULAR_OFFLOAD_DNS_QUERIES                                  1                                                                                                // set by application[*]
 #define MBED_CONF_CELLULAR_PRESENT                                              1                                                                                                // set by library:cellular
 #define MBED_CONF_CELLULAR_RANDOM_MAX_START_DELAY                               0                                                                                                // set by library:cellular
 #define MBED_CONF_CELLULAR_USE_APN_LOOKUP                                       0                                                                                                // set by library:cellular
@@ -148,6 +150,8 @@
 #define MBED_CONF_FAT_CHAN_FF_NORTC_MDAY                                        1                                                                                                // set by library:fat_chan
 #define MBED_CONF_FAT_CHAN_FF_NORTC_MON                                         1                                                                                                // set by library:fat_chan
 #define MBED_CONF_FAT_CHAN_FF_NORTC_YEAR                                        2017                                                                                             // set by library:fat_chan
+#define MBED_CONF_FAT_CHAN_FF_PRINT_FLOAT                                       0                                                                                                // set by library:fat_chan
+#define MBED_CONF_FAT_CHAN_FF_PRINT_LLI                                         0                                                                                                // set by library:fat_chan
 #define MBED_CONF_FAT_CHAN_FF_SFN_BUF                                           12                                                                                               // set by library:fat_chan
 #define MBED_CONF_FAT_CHAN_FF_STRF_ENCODE                                       3                                                                                                // set by library:fat_chan
 #define MBED_CONF_FAT_CHAN_FF_STR_VOLUME_ID                                     0                                                                                                // set by library:fat_chan
@@ -213,6 +217,7 @@
 #define MBED_CONF_LWIP_MEM_SIZE                                                 16000                                                                                            // set by library:lwip[PORTENTA_H7]
 #define MBED_CONF_LWIP_ND6_QUEUEING                                             0                                                                                                // set by library:lwip
 #define MBED_CONF_LWIP_ND6_RDNSS_MAX_DNS_SERVERS                                0                                                                                                // set by library:lwip
+#define MBED_CONF_LWIP_NETBUF_RECVINFO_ENABLED                                  0                                                                                                // set by library:lwip
 #define MBED_CONF_LWIP_NUM_NETBUF                                               8                                                                                                // set by library:lwip
 #define MBED_CONF_LWIP_NUM_PBUF                                                 8                                                                                                // set by library:lwip
 #define MBED_CONF_LWIP_PBUF_POOL_SIZE                                           5                                                                                                // set by library:lwip
@@ -236,6 +241,7 @@
 #define MBED_CONF_LWIP_TCP_WND                                                  (4 * TCP_MSS)                                                                                    // set by library:lwip
 #define MBED_CONF_LWIP_UDP_SOCKET_MAX                                           4                                                                                                // set by library:lwip
 #define MBED_CONF_LWIP_USE_MBED_TRACE                                           0                                                                                                // set by library:lwip
+#define MBED_CONF_MBED_TRACE_ENABLE                                             1                                                                                                // set by application[*]
 #define MBED_CONF_MCR20A_PROVIDE_DEFAULT                                        0                                                                                                // set by library:mcr20a
 #define MBED_CONF_NANOSTACK_LIBSERVICE_NSDYNMEM_TRACKER_ENABLED                 0                                                                                                // set by library:nanostack-libservice
 #define MBED_CONF_NANOSTACK_LIBSERVICE_PRESENT                                  1                                                                                                // set by library:nanostack-libservice
@@ -255,6 +261,7 @@
 #define MBED_CONF_PLATFORM_CALLBACK_NONTRIVIAL                                  1                                                                                                // set by application[*]
 #define MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED                                0                                                                                                // set by library:platform
 #define MBED_CONF_PLATFORM_CTHUNK_COUNT_MAX                                     8                                                                                                // set by library:platform
+#define MBED_CONF_PLATFORM_DEEPSLEEP_STATS_VERBOSE                              0                                                                                                // set by library:platform[STM]
 #define MBED_CONF_PLATFORM_DEFAULT_SERIAL_BAUD_RATE                             115200                                                                                           // set by application[*]
 #define MBED_CONF_PLATFORM_ERROR_ALL_THREADS_INFO                               0                                                                                                // set by library:platform
 #define MBED_CONF_PLATFORM_ERROR_FILENAME_CAPTURE_ENABLED                       0                                                                                                // set by library:platform
@@ -306,6 +313,7 @@
 #define MBED_CONF_RM1000_AT_BAUDRATE                                            230400                                                                                           // set by library:RM1000_AT
 #define MBED_CONF_RM1000_AT_PROVIDE_DEFAULT                                     0                                                                                                // set by library:RM1000_AT
 #define MBED_CONF_RTOS_API_PRESENT                                              1                                                                                                // set by library:rtos-api
+#define MBED_CONF_RTOS_ENABLE_ALL_RTX_EVENTS                                    0                                                                                                // set by library:rtos
 #define MBED_CONF_RTOS_EVFLAGS_NUM                                              0                                                                                                // set by library:rtos
 #define MBED_CONF_RTOS_IDLE_THREAD_STACK_SIZE                                   512                                                                                              // set by library:rtos
 #define MBED_CONF_RTOS_IDLE_THREAD_STACK_SIZE_DEBUG_EXTRA                       128                                                                                              // set by library:rtos[STM]
@@ -368,12 +376,13 @@
 #define MBED_CONF_TARGET_DEEP_SLEEP_LATENCY                                     4                                                                                                // set by target:MCU_STM32
 #define MBED_CONF_TARGET_DEFAULT_ADC_VREF                                       NAN                                                                                              // set by target:Target
 #define MBED_CONF_TARGET_GPIO_RESET_AT_INIT                                     0                                                                                                // set by target:MCU_STM32
+#define MBED_CONF_TARGET_I2C_TIMING_VALUE_ALGO                                  1                                                                                                // set by target:PORTENTA_H7
 #define MBED_CONF_TARGET_INIT_US_TICKER_AT_BOOT                                 1                                                                                                // set by target:MCU_STM32
 #define MBED_CONF_TARGET_INTERNAL_FLASH_UNIFORM_SECTORS                         1                                                                                                // set by target:Target
 #define MBED_CONF_TARGET_LPTICKER_LPTIM                                         1                                                                                                // set by target:MCU_STM32H7
 #define MBED_CONF_TARGET_LPTICKER_LPTIM_CLOCK                                   1                                                                                                // set by target:MCU_STM32
-#define MBED_CONF_TARGET_LPUART_CLOCK_SOURCE                                    USE_LPUART_CLK_LSE|USE_LPUART_CLK_PCLK1                                                          // set by target:MCU_STM32
-#define MBED_CONF_TARGET_LSE_AVAILABLE                                          0                                                                                                // set by target:PORTENTA_H7
+#define MBED_CONF_TARGET_LPUART_CLOCK_SOURCE                                    USE_LPUART_CLK_LSE|USE_LPUART_CLK_PCLK1|USE_LPUART_CLK_PCLK3                                     // set by target:MCU_STM32
+#define MBED_CONF_TARGET_LSE_AVAILABLE                                          1                                                                                                // set by target:PORTENTA_H7
 #define MBED_CONF_TARGET_LSE_BYPASS                                             1                                                                                                // set by target:PORTENTA_H7
 #define MBED_CONF_TARGET_LSE_DRIVE_LOAD_LEVEL                                   RCC_LSEDRIVE_LOW                                                                                 // set by target:MCU_STM32H7
 #define MBED_CONF_TARGET_MPU_ROM_END                                            0x0fffffff                                                                                       // set by target:Target

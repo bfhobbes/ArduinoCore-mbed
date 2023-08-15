@@ -1,6 +1,6 @@
 /*
   EthernetServer.h
-  Copyright (c) 2020 Arduino SA.  All right reserved.
+  Copyright (c) 2021 Arduino SA.  All right reserved.
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
   License as published by the Free Software Foundation; either
@@ -18,29 +18,22 @@
 #define ethernetserver_h
 
 #include "Ethernet.h"
-#include "api/Print.h"
-#include "api/Client.h"
-#include "api/IPAddress.h"
-#include "TLSSocket.h"
-#include "TCPSocket.h"
+#include "MbedServer.h"
+#include "EthernetClient.h"
 
 namespace arduino {
 
 class EthernetClient;
 
-class EthernetServer : public arduino::Server {
-private:
-  uint16_t _port;
-  TCPSocket* sock;
-public:
-  EthernetServer(uint16_t);
-  arduino::EthernetClient available(uint8_t* status = NULL);
-  void begin();
-  virtual size_t write(uint8_t);
-  virtual size_t write(const uint8_t *buf, size_t size);
-  uint8_t status();
+class EthernetServer : public MbedServer {
+  NetworkInterface* getNetwork() {
+    return Ethernet.getNetwork();
+  }
 
-  using Print::write;
+public:
+  EthernetServer(uint16_t port)
+    : MbedServer(port) {}
+  EthernetClient available(uint8_t* status = nullptr);
 };
 
 }
